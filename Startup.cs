@@ -20,6 +20,8 @@ namespace SuperShop
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            //serviço de conexão que registra o DataContext e indica o uso da connection string escrita no appsettings
             services.AddDbContext<DataContext>(config =>
             {
                 config.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection"));
