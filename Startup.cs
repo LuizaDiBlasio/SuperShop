@@ -27,6 +27,9 @@ namespace SuperShop
                 config.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            services.AddTransient<SeedDb>(); // configuração da injeção de dependências, objeto criado quando serviço for requisitado,
+                                             // depois de usado é descartado e só poderá ser criado novamente em uma nova execução da aplicação 
+
             services.AddControllersWithViews();
         }
 
