@@ -9,29 +9,28 @@ namespace SuperShop.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IRepository _repository;
 
-        public ProductsController(DataContext context)
+        public ProductsController(IRepository repository)
         {
-            _context = context;
+           _repository = repository;   
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Products.ToListAsync()); // vai à propriedade Products do DataContext buscar a lista de produtos e manda por paramatro para a view do index
+            return View(_repository.GetProducts()); // vai à interface IRepository buscar a lista de produtos e manda por paramatro para a view do index
         }
 
         // GET: Products/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id) // id aqui é nullable
         {
             if (id == null) //sempre checar se produto ainda existe para evitar erro, no meio tempo pode ter sido apagado
             {
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id); 
+            var product = _repository.GetProduct(id.Value); // pelo fato de ser nullable, tenho que passar o id pelo valor, o programa não irá rebentar mesmo que o valor seja nulo
             if (product == null)
             {
                 return NotFound();
@@ -55,9 +54,9 @@ namespace SuperShop.Controllers
         {
             if (ModelState.IsValid) //checa se o produto é válido
             {
-                _context.Add(product); //adiciona produto em memória
+                _repository.AddProduct(product); //adiciona produto em memória pelo repositório
 
-                await _context.SaveChangesAsync(); // grava de forma assícrona para aplicação continuar a correr 
+                await _repository.SaveAllAsync(); // grava de forma assícrona para aplicação continuar a correr 
 
                 return RedirectToAction(nameof(Index)); //redireciona para a lista de produtos
             }
@@ -65,14 +64,14 @@ namespace SuperShop.Controllers
         }
 
         // GET: Products/Edit/5
-        public async Task<IActionResult> Edit(int? id) //id nullable para se caso não haver id, o programa não irá arrebentar
+        public IActionResult Edit(int? id) //id nullable para se caso não haver id, o programa não irá arrebentar
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id); //checa na tabela se o id existe 
+            var product = _repository.GetProduct(id.Value); //busca produto pelo repositorio
             if (product == null)
             {
                 return NotFound();
@@ -96,12 +95,12 @@ namespace SuperShop.Controllers
             {
                 try //Salva modificações dentro do try catch
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
+                    _repository.UpdateProduct(product);
+                    await _repository.SaveAllAsync();
                 }
                 catch (DbUpdateConcurrencyException) // caso algo nao corra bem
                 {
-                    if (!ProductExists(product.Id)) //caso o produto não exista, exibir página de notfound
+                    if (!_repository.ProductExists(product.Id)) //caso o produto não exista, exibir página de notfound
                     {
                         return NotFound();
                     }
@@ -116,15 +115,15 @@ namespace SuperShop.Controllers
         }
 
         // GET: Products/Delete/5
-        public async Task<IActionResult> Delete(int? id) // Essa action encaminha o utilizador para a view do Delete para pode deletar o produto
+        public IActionResult Delete(int? id) // Essa action encaminha o utilizador para a view do Delete para pode deletar o produto
         {
             if (id == null) // caso id não exista, retorna NotFound
             {
                 return NotFound();
             }
 
-            var product = await _context.Products // caso id exista, ir buscar produto na tabela
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var product = _repository.GetProduct(id.Value); // ir buscar produto 
+             
 
             if (product == null) // caso produto seja nulo, retornar NotFound
             {
@@ -141,18 +140,13 @@ namespace SuperShop.Controllers
         //esta action deleta o produto de fato
         public async Task<IActionResult> DeleteConfirmed(int id) // id orbigatório para poder apagar 
         {
-            var product = await _context.Products.FindAsync(id); // checar produto na tabela
+            var product = _repository.GetProduct(id); // buscar produto pelo repositorio
 
-            _context.Products.Remove(product); //remove produto em memoria
+            _repository.RemoveProduct(product); //remove produto em memoria pelo repositorio
 
-            await _context.SaveChangesAsync(); //remove produto da base de dados
+            await _repository.SaveAllAsync(); //salva todas as modificações 
 
             return RedirectToAction(nameof(Index)); // volta para a lista de produtos no Index, sem o produto
-        }
-
-        private bool ProductExists(int id) // método auxiliar para ver se o produto existe
-        {
-            return _context.Products.Any(e => e.Id == id);
         }
 
         //OBS: Não existe PUT, CREATE e DELETE no HTML, esses 3 métodos do HTTP foram substituídos pelo POST, que irá fazer todas as alterações necessárias à base de dados

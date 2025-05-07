@@ -30,6 +30,11 @@ namespace SuperShop
             services.AddTransient<SeedDb>(); // configuração da injeção de dependências, objeto criado quando serviço for requisitado,
                                              // depois de usado é descartado e só poderá ser criado novamente em uma nova execução da aplicação 
 
+            services.AddScoped<IRepository, Repository>(); //quando for necessário, instanciar o objeto de Repository
+                                                           // num próximo uso, o objeto antigo será destruído e um novo será instanciado 
+                                                           //O serviço de Interface de repositórios permite trocar repositórios e fazer testes com diversar bases de dados
+                                                           // basta manter a interface base IRepository e trocar o repositório que se comunica com a nova base de dados (Repository) 
+
             services.AddControllersWithViews();
         }
 
