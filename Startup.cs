@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SuperShop.Data;
+using SuperShop.Data.Entities;
+using SuperShop.Helpers;
 
 namespace SuperShop
 {
@@ -21,14 +24,31 @@ namespace SuperShop
         public void ConfigureServices(IServiceCollection services)
         {
 
-            //serviço de conexão que registra o DataContext e indica o uso da connection string escrita no appsettings
-            services.AddDbContext<DataContext>(config =>
+            services.AddIdentity<User, IdentityRole>(cfg => //adicionar serviço de Identiy para ter o user e configurar o serviço
             {
-                config.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection"));
+                //configurações inseguras para poder fazer testes, mas em cenário déprodução deve ser o oposto
+                cfg.User.RequireUniqueEmail = true;
+                cfg.Password.RequireDigit = false;
+                cfg.Password.RequiredUniqueChars = 0;
+                cfg.Password.RequireLowercase = false;
+                cfg.Password.RequireUppercase = false;
+                cfg.Password.RequireNonAlphanumeric = false;
+                cfg.Password.RequiredLength = 6;
+
+            }).AddEntityFrameworkStores<DataContext>(); //Depois do serviço implementado continua a usar o DataContext, aplicar o serviço criado à BD
+
+            
+
+            //serviço de conexão que registra o DataContext e indica o uso da connection string escrita no appsettings
+            services.AddDbContext<DataContext>(cfg =>
+            {
+                cfg.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection"));
             });
 
             services.AddTransient<SeedDb>(); // configuração da injeção de dependências, objeto criado quando serviço for requisitado,
                                              // depois de usado é descartado e só poderá ser criado novamente em uma nova execução da aplicação 
+
+            services.AddScoped<IUserHelper, UserHelper>();
 
             services.AddScoped<IProductRepository, ProductRepository>(); //quando for necessário, instanciar o objeto de Repository
                                                            // num próximo uso, o objeto antigo será destruído e um novo será instanciado 
@@ -55,6 +75,8 @@ namespace SuperShop
             app.UseStaticFiles();
 
             app.UseRouting();
+            
+            app.UseAuthentication(); // usar autenticação, tem que ser na ordem, antes do enpoints e authorizations
 
             app.UseAuthorization();
 

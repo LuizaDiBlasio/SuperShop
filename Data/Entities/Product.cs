@@ -29,5 +29,7 @@ namespace SuperShop.Data.Entities
 
         [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)] //N se refere ao número, o C acima se refere à currency
         public double Stock {  get; set; }  
+
+        public User User { get; set; }  
     }
 }

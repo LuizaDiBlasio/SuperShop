@@ -1,11 +1,13 @@
 ﻿
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Data.Entities;
 
 namespace SuperShop.Data
 {
-    public class DataContext : DbContext //DbContext é a classe dos dados, representa a conexão com o banco, gerencia tabelas e consultas
-                                         //DataContext: Classe que herda de DbContext, onde configuro as tabelas
+    public class DataContext : IdentityDbContext<User> //DbContext é a classe dos dados, representa a conexão com o banco, gerencia tabelas e consultas
+                                                 // IdentityDbContext é a classe dos dados com autenticação
+                                                 //DataContext: Classe que herda de DbContext, onde configuro as tabelas
     {
 
         // A tabela Countries é definida por DbSet

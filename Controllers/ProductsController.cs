@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Data;
 using SuperShop.Data.Entities;
+using SuperShop.Helpers;
 
 namespace SuperShop.Controllers
 {
@@ -11,15 +12,18 @@ namespace SuperShop.Controllers
     {
         private readonly IProductRepository _productRepository;
 
-        public ProductsController(IProductRepository productRepository)
+        private readonly IUserHelper _userHelper;
+
+        public ProductsController(IProductRepository productRepository, IUserHelper userHelper)
         {
-           _productRepository = productRepository;   
+           _productRepository = productRepository;
+            _userHelper = userHelper;   
         }
 
         // GET: Products
         public IActionResult Index()
         {
-            return View(_productRepository.GetAll()); // vai à interface IRepository buscar a lista de produtos e manda por paramatro para a view do index
+            return View(_productRepository.GetAll().OrderBy(p => p.Name)); // vai à interface IRepository buscar a lista de produtos e manda por paramatro para a view do index
         }
 
         // GET: Products/Details/5
@@ -54,6 +58,9 @@ namespace SuperShop.Controllers
         {
             if (ModelState.IsValid) //checa se o produto é válido
             {
+                //TODO: Modificar para o user que tiver logado
+                product.User = await _userHelper.GetUserByEmailAsync("Luizabandeira90@gmail.com"); //buscar user para colocar na propriedade do produto ao ser criado
+
                 await _productRepository.CreateAsync(product); //adiciona produto em memória pelo repositório
 
                 return RedirectToAction(nameof(Index)); //redireciona para a lista de produtos
@@ -93,6 +100,9 @@ namespace SuperShop.Controllers
             {
                 try //Salva modificações dentro do try catch
                 {
+                    //TODO: Modificar para o user que tiver logado
+                    product.User = await _userHelper.GetUserByEmailAsync("Luizabandeira90@gmail.com"); //buscar user para colocar na propriedade do produto ao ser criado
+
                     await _productRepository.UpdateAsync(product);
                 }
                 catch (DbUpdateConcurrencyException) // caso algo nao corra bem
