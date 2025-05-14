@@ -1,10 +1,13 @@
-﻿using System.Linq;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Data;
 using SuperShop.Data.Entities;
 using SuperShop.Helpers;
+using SuperShop.Models;
 
 namespace SuperShop.Controllers
 {
@@ -54,10 +57,31 @@ namespace SuperShop.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Product product) // recebe o produto criado na View Create
+        public async Task<IActionResult> Create(ProductViewModel model) // recebe o produto (modelo da ProductViewModel) criado na View Create
         {
             if (ModelState.IsValid) //checa se o produto é válido
             {
+                var path = string.Empty; // caminho da imagem
+
+                if(model.ImageFile != null && model.ImageFile.Length > 0) //verificar se existe a imagem
+                {
+                    var guid = Guid.NewGuid().ToString(); //gera uma chave aleatória que depois é passada para string para poder compor a variável file
+                    var file = $"{guid}.jpg"; //variável que será o nome do ficheiro para evitar nomes de ficheiros iguais no sistema
+
+                    path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\products", file); //criar o caminho da imagem: buscar diretorio de onde está agora, acrescentar o caminho dos pastas criadas e o nome do ficheiro
+
+                    using (var stream = new FileStream(path, FileMode.Create)) //criar o ficheiro
+                    {
+                        await model.ImageFile.CopyToAsync(stream); //busca a imagem e guarda no ficheiro criado
+                    }
+
+                    path = $"~/images/products/{file}"; // depois de buscar o caminho pelo diretório corrente e gravar, podemos atualizar o caminho 
+                                                                                     //para poder guardar na base de dados apenas o localizador da imagem (o URL)
+                }
+
+                //mesmo usando o ProductViewModel, o que será criado e enviado para a base derá o product, então precisa converter o model para product por meio do método ToProduct()
+                var product = this.ToProduct(model, path);
+
                 //TODO: Modificar para o user que tiver logado
                 product.User = await _userHelper.GetUserByEmailAsync("Luizabandeira90@gmail.com"); //buscar user para colocar na propriedade do produto ao ser criado
 
@@ -65,7 +89,23 @@ namespace SuperShop.Controllers
 
                 return RedirectToAction(nameof(Index)); //redireciona para a lista de produtos
             }
-            return View(product); // caso não for válido, mostra a mesma view do Create só que com os dados do produto para poderem ser alterados
+            return View(model); // caso não for válido, mostra a mesma view do Create só que com os dados do produto para poderem ser alterados
+        }
+
+        private Product ToProduct(ProductViewModel model, string path)
+        {
+            return new Product //retornar o produto criado
+            {
+                Id = model.Id,
+                ImageURL = path,
+                Name = model.Name,
+                IsAvailable = model.IsAvailable,
+                LastPurchase = model.LastPurchase,
+                LastSale = model.LastSale,
+                Price = model.Price,
+                Stock = model.Stock,
+                User = model.User
+            };
         }
 
         // GET: Products/Edit/5
@@ -81,7 +121,26 @@ namespace SuperShop.Controllers
             {
                 return NotFound();
             }
-            return View(product); //mostra a view do Edit com os dados do produto passado por parametro
+
+            var model = this.ToProductViewModel(product);
+
+            return View(model); //mostra a view do Edit com os dados do produto passado por parametro
+        }
+
+        private ProductViewModel ToProductViewModel(Product product)
+        {
+            return new ProductViewModel
+            {
+                Id = product.Id,
+                ImageURL = product.ImageURL,
+                Name = product.Name,
+                IsAvailable = product.IsAvailable,
+                LastPurchase = product.LastPurchase,
+                LastSale = product.LastSale,
+                Price = product.Price,
+                Stock = product.Stock,
+                User = product.User
+            };
         }
 
         // POST: Products/Edit/5
@@ -89,17 +148,32 @@ namespace SuperShop.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Product product) //recebe o id do produto alterado e o produto
+        public async Task<IActionResult> Edit(ProductViewModel model) //recebe o model 
         {
-            if (id != product.Id) // checa se id existe
-            {
-                return NotFound();
-            }
 
             if (ModelState.IsValid) // validação do modelo OBS: ModelState é um objeto interno do ASP.NET Core MVC que armazena o estado de validação de um modelo
             {
                 try //Salva modificações dentro do try catch
                 {
+                    var path = model.ImageURL;
+
+                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    {
+                        var guid = Guid.NewGuid().ToString(); 
+                        var file = $"{guid}.jpg"; 
+
+                        path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\products", file );
+
+                        using (var stream = new FileStream(path, FileMode.Create))
+                        {
+                            await model.ImageFile.CopyToAsync(stream);
+                        }
+
+                        path = $"~/images/products/{file}";
+                    }
+
+                    var product = this.ToProduct(model, path);
+
                     //TODO: Modificar para o user que tiver logado
                     product.User = await _userHelper.GetUserByEmailAsync("Luizabandeira90@gmail.com"); //buscar user para colocar na propriedade do produto ao ser criado
 
@@ -107,7 +181,7 @@ namespace SuperShop.Controllers
                 }
                 catch (DbUpdateConcurrencyException) // caso algo nao corra bem
                 {
-                    if (! await _productRepository.ExistAsync(product.Id)) //caso o produto não exista, exibir página de notfound
+                    if (! await _productRepository.ExistAsync(model.Id)) //caso o produto não exista, exibir página de notfound
                     {
                         return NotFound();
                     }
@@ -118,7 +192,7 @@ namespace SuperShop.Controllers
                 }
                 return RedirectToAction(nameof(Index)); // se tudo correr bem, redireciona para o index com o produto já editado
             }
-            return View(product); //caso o modelo não seja válido, redireciona para a view do Edit com os dados do produto para serem editados novamente
+            return View(model); //caso o modelo não seja válido, redireciona para a view do Edit com os dados do produto para serem editados novamente
         }
 
         // GET: Products/Delete/5

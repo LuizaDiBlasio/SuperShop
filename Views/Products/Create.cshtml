@@ -1,4 +1,4 @@
-﻿@model SuperShop.Data.Entities.Product //como vai criar um novo produto tem que ter o modelo do produto
+﻿@model SuperShop.Models.ProductViewModel //deixa de se ligar à entidade Product e passa a seguir o modelo ProductViewModel para receber o ficheiro de imagem 
 
 @{
     ViewData["Title"] = "Create new product";
@@ -10,11 +10,11 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data"> @*enctype="multipart/form-data" código para indicar que vai entrar um ficheiro nessa view*@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div> @* Validação feita via javascript *@
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control" /> 
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -23,9 +23,9 @@
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ImageURL" class="control-label"></label>
-                <input asp-for="ImageURL" class="form-control" />
-                <span asp-validation-for="ImageURL" class="text-danger"></span>
+                <label asp-for="ImageFile" class="control-label"></label> @*mudar para ImageFile, propriedade da ProductViewModel ue contem a imagem*@
+                <input asp-for="ImageFile" class="form-control" type="file" /> @*ajustar tipo de input para file, para poder receber um ficheiro*@
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="LastPurchase" class="control-label"></label>

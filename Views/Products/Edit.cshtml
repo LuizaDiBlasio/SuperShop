@@ -1,4 +1,4 @@
-﻿@model SuperShop.Data.Entities.Product
+﻿@model SuperShop.Models.ProductViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -10,9 +10,10 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit"> @*o método POST está implícito pela convenção do ASP.NET Core Razor com o Tag Helper asp-action.*@
+        <form asp-action="Edit" enctype="multipart/form-data"> @*o método POST está implícito pela convenção do ASP.NET Core Razor com o Tag Helper asp-action.*@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" /> @*Passa o Id escondido para ter uma referência sempre que fizer modificações e depois submeter*@
+            <input type="hidden" asp-for="ImageURL" /> @*Passa o URL da imagem corrente, caso não haja modificações se mantém, passa hidden para ter a referência*@
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
@@ -24,9 +25,9 @@
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="ImageURL" class="control-label"></label>
-                <input asp-for="ImageURL" class="form-control" />
-                <span asp-validation-for="ImageURL" class="text-danger"></span>
+                <label asp-for="ImageFile" class="control-label"></label>
+                <input asp-for="ImageFile" class="form-control" type="file"/>
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="LastPurchase" class="control-label"></label>
@@ -54,7 +55,15 @@
             </div>
         </form>
     </div>
+    <div class="col-md-4">
+        @if (!string.IsNullOrEmpty(Model.ImageURL)) //se houver imagem
+        {
+            <img src="@Url.Content(Model.ImageURL)" alt="Image" style="width:300px;height:450px;max-width:100%;height:auto" />
+            //manda o link e carrega o seu conteúdo (imagem)
+        }
+    </div>
 </div>
+
 
 
 @section Scripts {

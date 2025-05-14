@@ -8,52 +8,65 @@
 
 <div>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageURL)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageURL)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastPurchase)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastPurchase)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastSale) @* Esses Html. e os asp- são tag helpers da tecnologia ASP NET *@
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LastSale)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsAvailable)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsAvailable)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Stock)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Stock)
-        </dd>
-    </dl>
+    <div class="row">
+        <div class="col-md-8">
+
+
+            <dl class="row">
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Name)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Name)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Price)
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.ImageURL)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.LastPurchase)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.LastPurchase)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.LastSale) @* Esses Html. e os asp- são tag helpers da tecnologia ASP NET *@
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.LastSale)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.IsAvailable)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.IsAvailable)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Stock)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Stock)
+                </dd>
+            </dl>
+        </div>
+        <div class="col-md-4">
+            @if (!string.IsNullOrEmpty(Model.ImageURL)) //se houver imagem
+            {
+                <img src="@Url.Content(Model.ImageURL)" alt="Image" style="width:300px;height:450px;max-width:100%;height:auto" />
+                //manda o link e carrega o seu conteúdo (imagem)
+            }
+        </div>
+    </div>
 </div>
+   
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a> @*Especifica a action mas não especifica de qual controlador ela vem, vai buscar por defeito a ação no controlador que gerou esta view que foi o ProductsController*@
     <a asp-action="Index" class="btn btn-success">Back to List</a>
 </div>
+
+
+

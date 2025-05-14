@@ -19,9 +19,6 @@
                 @Html.DisplayNameFor(model => model.Price)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ImageURL)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.LastPurchase)
             </th>
             <th>
@@ -37,17 +34,20 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImageURL)
-            </td>
+        @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ImageURL)) //se houver imagem
+                    {
+                        <img src ="@Url.Content(item.ImageURL)" alt="Image" style="width:100px;height:150px;max-width:100%;height:auto"/> //manda o link e carrega o seu conteúdo (imagem)
+                    }
+                </td>
             <td>
                 @Html.DisplayFor(modelItem => item.LastPurchase)
             </td>
