@@ -17,10 +17,16 @@ namespace SuperShop.Controllers
 
         private readonly IUserHelper _userHelper;
 
-        public ProductsController(IProductRepository productRepository, IUserHelper userHelper)
+        private readonly IImageHelper _imageHelper;
+        
+        private readonly IConverterHelper _converterHelper;
+
+        public ProductsController(IProductRepository productRepository, IUserHelper userHelper, IImageHelper imageHelper, IConverterHelper converterHelper)
         {
            _productRepository = productRepository;
             _userHelper = userHelper;   
+            _imageHelper = imageHelper; 
+            _converterHelper = converterHelper; 
         }
 
         // GET: Products
@@ -65,22 +71,11 @@ namespace SuperShop.Controllers
 
                 if(model.ImageFile != null && model.ImageFile.Length > 0) //verificar se existe a imagem
                 {
-                    var guid = Guid.NewGuid().ToString(); //gera uma chave aleatória que depois é passada para string para poder compor a variável file
-                    var file = $"{guid}.jpg"; //variável que será o nome do ficheiro para evitar nomes de ficheiros iguais no sistema
-
-                    path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\products", file); //criar o caminho da imagem: buscar diretorio de onde está agora, acrescentar o caminho dos pastas criadas e o nome do ficheiro
-
-                    using (var stream = new FileStream(path, FileMode.Create)) //criar o ficheiro
-                    {
-                        await model.ImageFile.CopyToAsync(stream); //busca a imagem e guarda no ficheiro criado
-                    }
-
-                    path = $"~/images/products/{file}"; // depois de buscar o caminho pelo diretório corrente e gravar, podemos atualizar o caminho 
-                                                                                     //para poder guardar na base de dados apenas o localizador da imagem (o URL)
+                    path = await _imageHelper.UploadImageAsync(model.ImageFile, "products"); //manda gravar o ficheiros na pasta products e recebe o caminho de volta
                 }
 
                 //mesmo usando o ProductViewModel, o que será criado e enviado para a base derá o product, então precisa converter o model para product por meio do método ToProduct()
-                var product = this.ToProduct(model, path);
+                var product = _converterHelper.ToProduct(model, true, path);
 
                 //TODO: Modificar para o user que tiver logado
                 product.User = await _userHelper.GetUserByEmailAsync("Luizabandeira90@gmail.com"); //buscar user para colocar na propriedade do produto ao ser criado
@@ -92,21 +87,7 @@ namespace SuperShop.Controllers
             return View(model); // caso não for válido, mostra a mesma view do Create só que com os dados do produto para poderem ser alterados
         }
 
-        private Product ToProduct(ProductViewModel model, string path)
-        {
-            return new Product //retornar o produto criado
-            {
-                Id = model.Id,
-                ImageURL = path,
-                Name = model.Name,
-                IsAvailable = model.IsAvailable,
-                LastPurchase = model.LastPurchase,
-                LastSale = model.LastSale,
-                Price = model.Price,
-                Stock = model.Stock,
-                User = model.User
-            };
-        }
+        
 
         // GET: Products/Edit/5
         public async Task<IActionResult> Edit(int? id) //id nullable para se caso não haver id, o programa não irá arrebentar
@@ -122,26 +103,12 @@ namespace SuperShop.Controllers
                 return NotFound();
             }
 
-            var model = this.ToProductViewModel(product);
+            var model = _converterHelper.ToProductViewModel(product);
 
             return View(model); //mostra a view do Edit com os dados do produto passado por parametro
         }
 
-        private ProductViewModel ToProductViewModel(Product product)
-        {
-            return new ProductViewModel
-            {
-                Id = product.Id,
-                ImageURL = product.ImageURL,
-                Name = product.Name,
-                IsAvailable = product.IsAvailable,
-                LastPurchase = product.LastPurchase,
-                LastSale = product.LastSale,
-                Price = product.Price,
-                Stock = product.Stock,
-                User = product.User
-            };
-        }
+        
 
         // POST: Products/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -155,24 +122,14 @@ namespace SuperShop.Controllers
             {
                 try //Salva modificações dentro do try catch
                 {
-                    var path = model.ImageURL;
+                    var path = model.ImageURL; 
 
-                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    if (model.ImageFile != null && model.ImageFile.Length > 0) 
                     {
-                        var guid = Guid.NewGuid().ToString(); 
-                        var file = $"{guid}.jpg"; 
-
-                        path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\products", file );
-
-                        using (var stream = new FileStream(path, FileMode.Create))
-                        {
-                            await model.ImageFile.CopyToAsync(stream);
-                        }
-
-                        path = $"~/images/products/{file}";
+                        path = await _imageHelper.UploadImageAsync(model.ImageFile, "products");
                     }
 
-                    var product = this.ToProduct(model, path);
+                    var product = _converterHelper.ToProduct(model, false, path);
 
                     //TODO: Modificar para o user que tiver logado
                     product.User = await _userHelper.GetUserByEmailAsync("Luizabandeira90@gmail.com"); //buscar user para colocar na propriedade do produto ao ser criado

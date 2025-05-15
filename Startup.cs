@@ -50,6 +50,10 @@ namespace SuperShop
 
             services.AddScoped<IUserHelper, UserHelper>();
 
+            services.AddScoped<IImageHelper, ImageHelper>();
+
+            services.AddScoped<IConverterHelper, ConverterHelper>();
+
             services.AddScoped<IProductRepository, ProductRepository>(); //quando for necessário, instanciar o objeto de Repository
                                                            // num próximo uso, o objeto antigo será destruído e um novo será instanciado 
                                                            //O serviço de Interface de repositórios permite trocar repositórios e fazer testes com diversar bases de dados
