@@ -1,0 +1,64 @@
+﻿@model SuperShop.Data.Entities.Product
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <div class="row">
+        <div class="col-md-8">
+
+            <dl class="row">
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Name)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Name)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Price)
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.ImageFullPath)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.LastPurchase)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.LastPurchase)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.LastSale) @* Esses Html. e os asp- são tag helpers da tecnologia ASP NET *@
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.LastSale)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.IsAvailable)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.IsAvailable)
+                </dd>
+                <dt class="col-sm-3">
+                    @Html.DisplayNameFor(model => model.Stock)
+                </dt>
+                <dd class="col-sm-9">
+                    @Html.DisplayFor(model => model.Stock)
+                </dd>
+            </dl>
+        </div>
+        <div class="col-md-4">
+            <img src="@Url.Content(Model.ImageFullPath)" alt="Image" style="width:300px;height:450px;max-width:100%;height:auto" />@*manda o link e carrega o seu conteúdo (imagem)*@
+        </div>
+    </div>
+    
+    <form asp-action="Delete"> @*Vai buscar a action do POST do Delete*@
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" />  
+        <a asp-action="Index" class="btn btn-success">Back to List</a>
+    </form>
+</div>

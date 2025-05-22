@@ -1,0 +1,67 @@
+﻿@model SuperShop.Models.ProductViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit Product</h1>
+
+<h4>Product</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" enctype="multipart/form-data"> @*o método POST está implícito pela convenção do ASP.NET Core Razor com o Tag Helper asp-action.*@
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" /> @*Passa o Id escondido para ter uma referência sempre que fizer modificações e depois submeter*@
+            <input type="hidden" asp-for="ImageId" /> @*Passa o Id da imagem corrente, caso não haja modificações se mantém, passa hidden para ter a referência*@
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImageFile" class="control-label"></label>
+                <input asp-for="ImageFile" class="form-control" type="file"/>
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastPurchase" class="control-label"></label>
+                <input asp-for="LastPurchase" class="form-control" />
+                <span asp-validation-for="LastPurchase" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastSale" class="control-label"></label>
+                <input asp-for="LastSale" class="form-control" />
+                <span asp-validation-for="LastSale" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsAvailable" /> @Html.DisplayNameFor(model => model.IsAvailable)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="Stock" class="control-label"></label>
+                <input asp-for="Stock" class="form-control" />
+                <span asp-validation-for="Stock" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" /> @*chama o POST do Edit no ProductsController*@
+                <a asp-action="Index" class="btn btn-success">Back to List</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4">
+     <img src="@Url.Content(Model.ImageFullPath)" alt="Image" style="width:300px;height:450px;max-width:100%;height:auto" /> @*Manda o link que carrega o conteudo da imagem*@
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
