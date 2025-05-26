@@ -14,41 +14,9 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" /> @*Passa o Id escondido para ter uma referência sempre que fizer modificações e depois submeter*@
             <input type="hidden" asp-for="ImageId" /> @*Passa o Id da imagem corrente, caso não haja modificações se mantém, passa hidden para ter a referência*@
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ImageFile" class="control-label"></label>
-                <input asp-for="ImageFile" class="form-control" type="file"/>
-                <span asp-validation-for="ImageFile" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LastPurchase" class="control-label"></label>
-                <input asp-for="LastPurchase" class="form-control" />
-                <span asp-validation-for="LastPurchase" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LastSale" class="control-label"></label>
-                <input asp-for="LastSale" class="form-control" />
-                <span asp-validation-for="LastSale" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsAvailable" /> @Html.DisplayNameFor(model => model.IsAvailable)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="Stock" class="control-label"></label>
-                <input asp-for="Stock" class="form-control" />
-                <span asp-validation-for="Stock" class="text-danger"></span>
-            </div>
+           
+            <partial name="_Products" /> @*chamar a vista parcial com conteúdo em comum de Create e Edit*@
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" /> @*chama o POST do Edit no ProductsController*@
                 <a asp-action="Index" class="btn btn-success">Back to List</a>

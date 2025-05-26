@@ -16,5 +16,7 @@ namespace SuperShop.Helpers
 
         //Faz upload da imagem, parametros: caminho da imagem e container onde vai ser guardada a imagem, retorna um guid identificador do blob
         Task<Guid> UploadBlobAsync(string image, string containerName);
+
+        //Blobs (usar containers no Azure) são mais rápidos para carregarem imagens comparados com as pastas de imagens locais
     }
 }

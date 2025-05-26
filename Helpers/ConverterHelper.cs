@@ -1,3 +1,4 @@
+
 ﻿using System;
 using System.IO;
 using SuperShop.Data.Entities;
@@ -7,7 +8,9 @@ namespace SuperShop.Helpers
 {
     public class ConverterHelper : IConverterHelper
     {
+
         public Product ToProduct(ProductViewModel model, bool isNew, Guid imageId)
+
         {
             return new Product //retornar o produto criado
             {

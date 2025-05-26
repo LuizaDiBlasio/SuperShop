@@ -30,12 +30,10 @@ namespace SuperShop.Data.Entities
         [DisplayFormat(DataFormatString = "{0:N2}", ApplyFormatInEditMode = false)] //N se refere ao número, o C acima se refere à currency
         public double Stock {  get; set; }  
 
-        public User User { get; set; }
+        public User User { get; set; }  
 
         //caso não exista image, ir buscar o icone de noimage servidor do site, caso existir, ir buscar o ImageId contido no blob
         public string ImageFullPath => ImageId == Guid.Empty 
             ? $"https://supershopbandeira-h7fhf8hqcmfcdfes.westeurope-01.azurewebsites.net/images/products/noImage.jpg" : $"https://supershopbandeira.blob.core.windows.net/products/{ImageId}";
-        
     }
-
 }
