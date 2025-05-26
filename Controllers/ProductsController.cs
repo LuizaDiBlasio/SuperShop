@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Data;
@@ -11,6 +12,7 @@ using SuperShop.Models;
 
 namespace SuperShop.Controllers
 {
+    
     public class ProductsController : Controller
     {
         private readonly IProductRepository _productRepository;
@@ -53,6 +55,7 @@ namespace SuperShop.Controllers
         }
 
         // GET: Products/Create
+        [Authorize] //Data Anotation que dá acesso somente users autorizados (logados)
         public IActionResult Create()
         {
             return View(); 
@@ -87,9 +90,10 @@ namespace SuperShop.Controllers
             return View(model); // caso não for válido, mostra a mesma view do Create só que com os dados do produto para poderem ser alterados
         }
 
-        
+
 
         // GET: Products/Edit/5
+        [Authorize] //Data Anotation que dá acesso somente users autorizados (logados)
         public async Task<IActionResult> Edit(int? id) //id nullable para se caso não haver id, o programa não irá arrebentar
         {
             if (id == null)

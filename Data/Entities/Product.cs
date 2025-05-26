@@ -33,7 +33,11 @@ namespace SuperShop.Data.Entities
         public User User { get; set; }  
 
         //caso não exista image, ir buscar o icone de noimage servidor do site, caso existir, ir buscar o ImageId contido no blob
-        public string ImageFullPath => ImageId == Guid.Empty 
-            ? $"https://supershopbandeira-h7fhf8hqcmfcdfes.westeurope-01.azurewebsites.net/images/products/noImage.jpg" : $"https://supershopbandeira.blob.core.windows.net/products/{ImageId}";
+        public string ImageFullPath => ImageId == Guid.Empty
+            //TODO prestar atenção na hora do mobile
+              //? $"https://supershopbandeira-h7fhf8hqcmfcdfes.westeurope-01.azurewebsites.net/images/products/noImage.jpg" : $"https://supershopbandeira.blob.core.windows.net/products/{ImageId}";
+
+              ? $"/images/products/noImage.jpg" // caminho relativo à raiz da aplicação!
+    : $"https://supershopbandeira.blob.core.windows.net/products/{ImageId}";
     }
 }

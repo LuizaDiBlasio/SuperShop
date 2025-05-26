@@ -14,7 +14,7 @@
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SuperShop</a> @*No Layout sempre que for executar uma action, tem que especificar qual o controlador e qual a action,
                                                                                                                 pois o layout é comum a todos os controladores, não vem de nenhum controlador*@
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -30,7 +30,26 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-                      
+
+                    </ul>
+
+                    @*modificações feitas no Shared para estar presente em todas*@
+                    <ul class="nav navbar-nav navbar-right">
+                        @if (this.User.Identity.IsAuthenticated) @*se estiver autenticado, mostrar username (tem a possibilidade de mudar clicando em cima do username ou de fazer logout)*@
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="ChangeUser">@this.User.Identity.Name</a> @*fazer action ChangeUser com o utilizador corrente*@
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a> @*Botão de logout*@
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a> @*Botão de login*@
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
