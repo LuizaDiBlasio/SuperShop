@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SuperShop.Controllers
 {
-    public class AccountController : Controller //controller respon´sável por logins
+    public class AccountController : Controller //controller responsável por logins
     {
         IUserHelper _userHelper;
 
@@ -114,5 +114,79 @@ namespace SuperShop.Controllers
             return View(model); //passa modelo de volta para não ficar campos em branco
         }
 
+        public async Task<IActionResult> ChangeUser()
+        {
+            var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name); //buscar user por email
+
+            var model = new ChangeUserViewModel(); //criar modelo para mostrar dados
+
+            if (user != null) //caso user exista, preencher novo modelo com dados do user
+            {
+                model.FirstName = user.FirstName;
+                model.LastName = user.LastName;
+            }
+
+            return View(model); //retornar model novo para view
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeUser(ChangeUserViewModel model)
+        {
+            if(ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name); //buscar user por email
+
+                if (user != null) //caso user exista, user com propridades registradas no modelo
+                {
+                    user.FirstName = model.FirstName;
+                    user.LastName = model.LastName; 
+
+                    var response = await _userHelper.UpdateUserAsync(user); //fazer update do user
+
+                    if(response.Succeeded)
+                    {
+                        ViewBag.UserMessage = "User updated";
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, response.Errors.FirstOrDefault().Description); //pedir a primeira mensagem de erro
+                    }
+                }
+            }
+            return View(model); //retornar model novo para view
+        }
+
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid) //se modelo é válido
+            {
+                var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name); //verificar user
+                if (user != null)
+                {
+                    var result = await _userHelper.ChangePasswordAsync(user, model.OldPassword, model.NewPassword); //muda password
+
+                    if (result.Succeeded)
+                    {
+                        return this.RedirectToAction("ChangeUser"); //redireciona para view ChangeUser
+                    }
+                    else
+                    {
+                        this.ModelState.AddModelError(string.Empty, result.Errors.FirstOrDefault().Description); //mensagem de erro
+                    }
+                }
+                else //se for nulo
+                {
+                    this.ModelState.AddModelError(string.Empty, "User not found");
+                }
+            }
+
+            return this.View(model); //retornar model para view caso corra mal
+        }
     }
 }
