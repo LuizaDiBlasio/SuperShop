@@ -80,8 +80,7 @@ namespace SuperShop.Controllers
                 //mesmo usando o ProductViewModel, o que será criado e enviado para a base derá o product, então precisa converter o model para product por meio do método ToProduct()
                 var product = _converterHelper.ToProduct(model, true, imageId);
 
-                //TODO: Modificar para o user que tiver logado
-                product.User = await _userHelper.GetUserByEmailAsync("Luizabandeira90@gmail.com"); //buscar user para colocar na propriedade do produto ao ser criado
+                product.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name); //buscar user usado no momento para colocar na propriedade do produto ao ser criado
 
                 await _productRepository.CreateAsync(product); //adiciona produto em memória pelo repositório
 
@@ -135,8 +134,7 @@ namespace SuperShop.Controllers
 
                     var product = _converterHelper.ToProduct(model, false, imageId);
 
-                    //TODO: Modificar para o user que tiver logado
-                    product.User = await _userHelper.GetUserByEmailAsync("Luizabandeira90@gmail.com"); //buscar user para colocar na propriedade do produto ao ser criado
+                    product.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name); //buscar user usado no momento para colocar na propriedade do produto ao ser criado
 
                     await _productRepository.UpdateAsync(product);
                 }
@@ -157,6 +155,7 @@ namespace SuperShop.Controllers
         }
 
         // GET: Products/Delete/5
+        [Authorize] //Data Anotation que dá acesso somente users autorizados (logados)
         public async Task<IActionResult> Delete(int? id) // Essa action encaminha o utilizador para a view do Delete para pode deletar o produto
         {
             if (id == null) // caso id não exista, retorna NotFound

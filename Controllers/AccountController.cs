@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using SuperShop.Data.Entities;
 using SuperShop.Helpers;
 using SuperShop.Models;
 using System.Linq;
@@ -59,6 +61,58 @@ namespace SuperShop.Controllers
             return RedirectToAction("Index", "Home");   
         }
 
+        public IActionResult Register() //só mostra a view do Register
+        {
+            return View();  
+        }
+
+        [HttpPost]
+
+        public async Task<IActionResult> Register(RegisterNewUserViewModel model) // registra o user
+        {
+            if (ModelState.IsValid) //ver se modelo é válido
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.Username); //buscar user  
+
+                if(user == null) // caso user não exista, registrá-lo
+                {
+                    user = new User
+                    {
+                        FirstName = model.FirstName,
+                        LastName = model.LastName,
+                        Email = model.Username,
+                        UserName = model.Username
+                    };
+
+                    var result = await _userHelper.AddUserAsync(user, model.Password); //add user depois de criado
+
+                    if(result != IdentityResult.Success) // caso não consiga criar user
+                    {
+                        ModelState.AddModelError(string.Empty, "The user couldn't be created");
+                        return View(model); //passa modelo de volta para não ficar campos em branco
+                    }
+
+                    var loginViewModel = new LoginViewModel //mandar informações de login
+                    {
+                        Password = model.Password,
+                        RememberMe = false,
+                        Username = model.Username
+                    };
+
+                    var result2 = await _userHelper.LoginAsync(loginViewModel); //fazer login 
+
+                    if(result2.Succeeded) //se conseguiu logar, redirecionar para Home
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }
+
+                    //se não conseguiu loggar:
+                    ModelState.AddModelError(string.Empty, "The user couldn't be logged");
+                }   
+            }
+
+            return View(model); //passa modelo de volta para não ficar campos em branco
+        }
 
     }
 }
