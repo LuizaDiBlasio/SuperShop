@@ -18,5 +18,11 @@ namespace SuperShop.Helpers
         Task<IdentityResult> UpdateUserAsync(User user); //update user na BD
 
         Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword); //muda pass do user 
+
+        Task CheckRoleAsync(string roleName); //verifica se existem roles
+
+        Task AddUserToRoleAsync(User user, string roleName); // designa o role ao user
+
+        Task<bool> IsUserInRoleAsync(User user, string roleName); // verifica se user está designado ao role
     }
 }

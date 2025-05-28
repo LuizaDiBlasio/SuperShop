@@ -55,7 +55,7 @@ namespace SuperShop.Controllers
         }
 
         // GET: Products/Create
-        [Authorize] //Data Anotation que dá acesso somente users autorizados (logados)
+        [Authorize(Roles ="Admin")] //Data Anotation que dá acesso somente users autorizados (logados)
         public IActionResult Create()
         {
             return View(); 

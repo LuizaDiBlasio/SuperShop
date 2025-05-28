@@ -11,10 +11,13 @@ namespace SuperShop.Helpers
 
         private readonly SignInManager<User> _signInManager; // classe que faz a gestão dos signIns
 
-        public UserHelper(UserManager<User> userManager, SignInManager<User> signInManager)
+        private readonly RoleManager<IdentityRole> _roleManager; // classe que faz a gestão dos roles (usa o IdentityRole default por que não criamos a nossa para classe para os roles)
+
+        public UserHelper(UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
 
         }
 
@@ -24,14 +27,37 @@ namespace SuperShop.Helpers
             return await _userManager.CreateAsync(user, password);  
         }
 
+        public async Task AddUserToRoleAsync(User user, string roleName)
+        {
+            await _userManager.AddToRoleAsync(user, roleName); 
+        }
+
         public async Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword)
         {
             return await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
         }
 
+        public async Task CheckRoleAsync(string roleName)
+        {
+            var roleExists = await _roleManager.RoleExistsAsync(roleName); // se existe, buscar o role
+            
+            if(!roleExists) // se não existe, criar
+            {
+                await _roleManager.CreateAsync(new IdentityRole
+                {
+                    Name = roleName
+                });
+            }
+        }
+
         public async Task<User> GetUserByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);
+        }
+
+        public async Task<bool> IsUserInRoleAsync(User user, string roleName)
+        {
+            return await _userManager.IsInRoleAsync(user, roleName); //devolve uma booleana dizendo se user está no role ou não
         }
 
         public async Task<SignInResult> LoginAsync(LoginViewModel model)
@@ -48,5 +74,7 @@ namespace SuperShop.Helpers
         {
             return await _userManager.UpdateAsync(user);
         }
+
+       
     }
 }
