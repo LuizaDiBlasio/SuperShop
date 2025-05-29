@@ -29,7 +29,7 @@ namespace SuperShop.Data
 
             await _userHelper.CheckRoleAsync("Admin"); //verificar se já existe um role de admin, se não existir cria
 
-            //TODO adicionar Role de customer aos outros utilizadores
+            
             await _userHelper.CheckRoleAsync("Customer"); //verificar se já existe um role de customer, se não existir cria
 
             var user = await _userHelper.GetUserByEmailAsync("Luizabandeira90@gmail.com"); //ver se user já existe 
@@ -55,7 +55,7 @@ namespace SuperShop.Data
                 await _userHelper.AddUserToRoleAsync(user, "Admin"); //adiciona role ao user
             }
 
-            var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin"); //verifica se role foi designado para user
+            var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin"); //verifica se role foi designado para user existente
 
             if (!isInRole) //se não estiver o role, colocar
             {
