@@ -42,13 +42,13 @@ namespace SuperShop.Controllers
         {
             if (id == null) //sempre checar se produto ainda existe para evitar erro, no meio tempo pode ter sido apagado
             {
-                return NotFound();
+                return new NotFoundViewResult("ProductNotFound"); // criar objeto da classe NotFound e mandar para view
             }
 
             var product = await _productRepository.GetByIdAsync(id.Value); // pelo fato de ser nullable, tenho que passar o id pelo valor, o programa não irá rebentar mesmo que o valor seja nulo
             if (product == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ProductNotFound"); // criar objeto da classe NotFound e mandar para view
             }
 
             return View(product); //manda para a view o produto encontrado 
@@ -97,13 +97,13 @@ namespace SuperShop.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ProductNotFound"); // criar objeto da classe NotFound e mandar para view
             }
 
             var product = await _productRepository.GetByIdAsync(id.Value); //busca produto pelo repositorio
             if (product == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("ProductNotFound");
             }
 
             var model = _converterHelper.ToProductViewModel(product);
@@ -160,7 +160,7 @@ namespace SuperShop.Controllers
         {
             if (id == null) // caso id não exista, retorna NotFound
             {
-                return NotFound();
+                return new NotFoundViewResult("ProductNotFound"); // criar objeto da classe NotFound e mandar para view
             }
 
             var product = await _productRepository.GetByIdAsync(id.Value); // ir buscar produto 
@@ -168,7 +168,7 @@ namespace SuperShop.Controllers
 
             if (product == null) // caso produto seja nulo, retornar NotFound
             {
-                return NotFound();
+                return new NotFoundViewResult("ProductNotFound"); // criar objeto da classe NotFound e mandar para view
             }
 
             return View(product); // enviar produto para a view para ser deletado
@@ -188,9 +188,16 @@ namespace SuperShop.Controllers
             return RedirectToAction(nameof(Index)); // volta para a lista de produtos no Index, sem o produto
         }
 
+        public IActionResult ProductNotFound()
+        {
+            return View();  
+        }
+
         //OBS: Não existe PUT, CREATE e DELETE no HTML, esses 3 métodos do HTTP foram substituídos pelo POST, que irá fazer todas as alterações necessárias à base de dados
         // O Html não suporta esses outros 3 métodos,também existe a limitação do navegador por motivo de segurança (ValidateAntiForgeryToken) no caso do DELETE
 
         //OBS 2: O método GET é um métod generalista que serve tanto para ir buscar dados na DB como para encaminhar o utilizador para uma View
+
+
     }
 }

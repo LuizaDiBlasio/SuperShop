@@ -55,9 +55,16 @@ namespace SuperShop
             services.AddScoped<IConverterHelper, ConverterHelper>();
 
             services.AddScoped<IProductRepository, ProductRepository>(); //quando for necessário, instanciar o objeto de Repository
-                                                           // num próximo uso, o objeto antigo será destruído e um novo será instanciado 
-                                                           //O serviço de Interface de repositórios permite trocar repositórios e fazer testes com diversar bases de dados
-                                                           // basta manter a interface base IRepository e trocar o repositório que se comunica com a nova base de dados (Repository) 
+                                                                         // num próximo uso, o objeto antigo será destruído e um novo será instanciado 
+                                                                         //O serviço de Interface de repositórios permite trocar repositórios e fazer testes com diversar bases de dados
+                                                                         // basta manter a interface base IRepository e trocar o repositório que se comunica com a nova base de dados (Repository) 
+
+            //anula o ReturnUrl no Login (AccountController)
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/NotAuthorized"; //ao invés de aparecer página do login, executar a action de NotAuthorized
+                options.AccessDeniedPath = "/Account/NotAuthorized";
+            });
 
             services.AddControllersWithViews();
         }
@@ -75,7 +82,12 @@ namespace SuperShop
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            //executar isso sempre no primeiro controller (Home)
+            app.UseStatusCodePagesWithReExecute("/error/{0}"); //não encontra uma certa´página e reexecuta algo, envia por parametro o endpoint do controller que diz como as páginas são executadas
+
             app.UseHttpsRedirection();
+            
             app.UseStaticFiles();
 
             app.UseRouting();

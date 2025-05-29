@@ -91,6 +91,7 @@ namespace SuperShop.Controllers
                         ModelState.AddModelError(string.Empty, "The user couldn't be created");
                         return View(model); //passa modelo de volta para não ficar campos em branco
                     }
+
                     //TODO  checar se roles estão corretos pra customer
                     await _userHelper.AddUserToRoleAsync(user, "Customer"); //adiciona role ao user...............ROLE
 
@@ -196,6 +197,11 @@ namespace SuperShop.Controllers
             }
 
             return this.View(model); //retornar model para view caso corra mal
+        }
+
+        public IActionResult NotAuthorized()
+        {
+            return View();      
         }
     }
 }
