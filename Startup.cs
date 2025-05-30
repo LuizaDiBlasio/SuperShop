@@ -57,7 +57,9 @@ namespace SuperShop
             services.AddScoped<IProductRepository, ProductRepository>(); //quando for necessário, instanciar o objeto de Repository
                                                                          // num próximo uso, o objeto antigo será destruído e um novo será instanciado 
                                                                          //O serviço de Interface de repositórios permite trocar repositórios e fazer testes com diversar bases de dados
-                                                                         // basta manter a interface base IRepository e trocar o repositório que se comunica com a nova base de dados (Repository) 
+                                                                         // basta manter a interface base IRepository e trocar o repositório que se comunica com a nova base de dados (Repository)
+                                                                         
+            services.AddScoped<IOrderRepository, OrderRepository>();
 
             //anula o ReturnUrl no Login (AccountController)
             services.ConfigureApplicationCookie(options =>

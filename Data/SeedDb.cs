@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SuperShop.Data.Entities;
 using SuperShop.Helpers;
 
@@ -25,11 +26,10 @@ namespace SuperShop.Data
 
         public async Task SeedAsync() //método para adicionar produtoas à DB
         {
-            await _context.Database.EnsureCreatedAsync(); // checa se a BD está criada, caso não esteja, cria uma BD aos moldes do _context
+            await _context.Database.MigrateAsync(); // Faz migrações pendentes. Caso não exista BD, cria uma BD aos moldes do _context 
 
             await _userHelper.CheckRoleAsync("Admin"); //verificar se já existe um role de admin, se não existir cria
 
-            
             await _userHelper.CheckRoleAsync("Customer"); //verificar se já existe um role de customer, se não existir cria
 
             var user = await _userHelper.GetUserByEmailAsync("Luizabandeira90@gmail.com"); //ver se user já existe 

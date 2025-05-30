@@ -10,8 +10,14 @@ namespace SuperShop.Data
                                                  //DataContext: Classe que herda de DbContext, onde configuro as tabelas
     {
 
-        // A tabela Countries é definida por DbSet
+        // As tabelas são definidas por DbSet
         public DbSet<Product> Products { get; set; }
+
+        public DbSet<Order> Orders { get; set; }
+
+        public DbSet<OrderDetail> OrderDetails { get; set; }
+
+        public DbSet<OrderDetailTemp> OrderDetailsTemp { get; set; }    
 
         // Recebe as configurações através do objeto options (DbContextOptions) e passa para a classe base DbContext,
         // permitindo que o Entity Framework configure e acesse o banco de dados.

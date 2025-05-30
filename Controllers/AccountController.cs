@@ -93,7 +93,7 @@ namespace SuperShop.Controllers
                     }
 
                     //TODO  checar se roles estão corretos pra customer
-                    await _userHelper.AddUserToRoleAsync(user, "Customer"); //adiciona role ao user...............ROLE
+                    await _userHelper.AddUserToRoleAsync(user, "Customer"); //adiciona role ao user
 
                     var loginViewModel = new LoginViewModel //mandar informações de login
                     {
@@ -113,11 +113,11 @@ namespace SuperShop.Controllers
                     ModelState.AddModelError(string.Empty, "The user couldn't be logged");
                 }
 
-                var isInRole = await _userHelper.IsUserInRoleAsync(user, "Customer"); //verifica se role foi designado para user existente..........ROLE
+                var isInRole = await _userHelper.IsUserInRoleAsync(user, "Customer"); //verifica se role foi designado para user existente
 
-                if (!isInRole) //se não estiver o role, colocar..............ROLE
+                if (!isInRole) //se não estiver o role, colocar
                 {
-                    await _userHelper.CheckRoleAsync("Customer");//..........ROLE
+                    await _userHelper.CheckRoleAsync("Customer");
                 }
             }
 

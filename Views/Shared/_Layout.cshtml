@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SuperShop</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /> @* link para bootstrap - modelo da interface*@
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" /> @*usar sempre versão minficada, pesa menos no fronted*@
     <link href="https://fonts.googleapis.com/css?family=Raleway:500,800" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" />
@@ -51,6 +51,9 @@
                         @if (this.User.Identity.IsAuthenticated) @*se estiver autenticado, mostrar username (tem a possibilidade de mudar clicando em cima do username ou de fazer logout)*@
                         {
                             <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Orders" asp-action="Index">Orders</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="ChangeUser">@this.User.Identity.Name</a> @*fazer action ChangeUser com o utilizador corrente*@
                             </li>
                             <li class="nav-item">
@@ -79,8 +82,8 @@
             &copy; 2025 - SuperShop - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script> @*Jquery são as mensagens de erro de validação*@
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> @* Script do bootsatrp, modelo da interface*@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
