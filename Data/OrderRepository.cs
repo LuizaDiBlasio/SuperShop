@@ -60,6 +60,20 @@ namespace SuperShop.Data
 
         }
 
+        public async Task DeleteDetailTempAsync(int id)
+        {
+            var orderDetailTemp = await _context.OrderDetailsTemp.FindAsync(id); //buscar order temporária
+            
+            if(orderDetailTemp == null)
+            {
+                return; 
+            }
+
+            _context.OrderDetailsTemp.Remove(orderDetailTemp); //se exister order, remover
+            
+            await _context.SaveChangesAsync();  //salvar alterações na bd
+        }
+
         public async Task<IQueryable<OrderDetailTemp>> GetDetailTempsAsync(string name)
         {
            var user = await _userHelper.GetUserByEmailAsync(name); //sempre verificar o user

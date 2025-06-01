@@ -55,5 +55,42 @@ namespace SuperShop.Controllers
 
             return View(model); //se correr mal vai para view com o modelo
         }
+
+        public async Task<IActionResult> DeleteItem(int? id)
+        {
+            if (id == null) //buscar order
+            {
+                return NotFound();
+            }
+
+            await _orderRepository.DeleteDetailTempAsync(id.Value); //deleta a order
+
+            return RedirectToAction("Create"); //volta pra view Create atualizada
+        }
+
+        public async Task<IActionResult> Increase(int? id)
+        {
+            if (id == null) //buscar order
+            {
+                return NotFound();
+            }
+
+            await _orderRepository.ModifyOrderDetailTempQuantityAsync(id.Value, 1); //modifica quantidade do produto, o 1 representa o click do botão
+
+            return RedirectToAction("Create"); //volta pra view Create atualizada
+        }
+
+        public async Task<IActionResult> Decrease(int? id)
+        {
+            if (id == null) //buscar order
+            {
+                return NotFound();
+            }
+
+            await _orderRepository.ModifyOrderDetailTempQuantityAsync(id.Value, -1); //modifica quantidade do produto, o -1 representa o click do botão
+
+            return RedirectToAction("Create"); //volta pra view Create atualizada
+        }
+
     }
 }
