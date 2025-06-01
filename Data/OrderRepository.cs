@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SuperShop.Data.Entities;
 using SuperShop.Helpers;
+using SuperShop.Models;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,6 +16,48 @@ namespace SuperShop.Data
         {
             _context = context;
             _userHelper = userHelper;   
+        }
+
+        public async Task AddItemToOrderAsync(AddItemViewModel model, string username) //adiciona itens à order, pela primeira vez ou não
+        {
+            var user = await _userHelper.GetUserByEmailAsync(username); //checar user
+
+            if (user == null)
+            {
+                return; // para ação se não houver user
+            }
+
+            var product = await _context.Products.FindAsync(model.ProductId); // checar se produto está na bd
+
+            if(product == null)
+            {
+                return; //parar ação se não houver produto
+            }
+
+            //se houver produto e user, buscar orderDetaiTemp
+            var orderDetailTemp = await _context.OrderDetailsTemp.Where(odt => odt.User == user && odt.Product == product).FirstOrDefaultAsync();
+
+            if (orderDetailTemp == null) //se não houver odt, significa que é a primeira order a ser feita
+            {
+                orderDetailTemp = new OrderDetailTemp
+                {
+                    Price = product.Price,
+                    Product = product,
+                    Quantity = model.Quantity,
+                    User = user,    
+                };
+
+                _context.OrderDetailsTemp.Add(orderDetailTemp); //adicionar novo objeto em memória
+            }
+            else //se order já existe
+            {
+                orderDetailTemp.Quantity += model.Quantity; //adicionar à quantitade antiga
+                
+                _context.OrderDetailsTemp.Update(orderDetailTemp); //faz update à order em memória
+            }
+
+            await _context.SaveChangesAsync(); //gravar na base de dados
+
         }
 
         public async Task<IQueryable<OrderDetailTemp>> GetDetailTempsAsync(string name)
@@ -48,6 +91,24 @@ namespace SuperShop.Data
 
             //caso não seja admin, buscar todas as orders do user (Ir na lista Items em Orders  buscar orders com nome do produto, ordenar por data da order )
             return _context.Orders.Include(o => o.Items).ThenInclude(p => p.Product).Where(o => o.User == user).OrderByDescending(o => o.OrderDate);  
+        }
+
+        public async Task ModifyOrderDetailTempQuantityAsync(int id, int quantity) //order já foi selecionada, e agora vai ter sua quantidade modificada
+        {
+            var orderDetailTemp = await _context.OrderDetailsTemp.FindAsync(id);    
+
+            if(orderDetailTemp == null)
+            {
+                return;
+            }
+
+            orderDetailTemp.Quantity += quantity;
+
+            if(orderDetailTemp.Quantity > 0) // como pode aumentar ou diminuir quantidade de produtos, tem que checar se é > 0
+            {
+                _context.OrderDetailsTemp.Update(orderDetailTemp);  
+                await _context.SaveChangesAsync(); //salva na base de dados
+            }    
         }
     }
 }

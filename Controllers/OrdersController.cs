@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SuperShop.Data;
 using SuperShop.Models;
-using System.Threading.Tasks;
+
 
 namespace SuperShop.Controllers
 {
@@ -41,6 +42,18 @@ namespace SuperShop.Controllers
             };
 
             return View(model); //envia modelo com lista de produtos e qauntidade 1 por default
+        }
+
+        [HttpPost]
+        public async Task <IActionResult> AddProduct(AddItemViewModel model)
+        {
+           if(ModelState.IsValid)
+            {
+                await _orderRepository.AddItemToOrderAsync(model, this.User.Identity.Name); //adicionar produto à order
+                return RedirectToAction("Create"); //redirecionar para create
+            }
+
+            return View(model); //se correr mal vai para view com o modelo
         }
     }
 }
