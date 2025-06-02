@@ -92,5 +92,16 @@ namespace SuperShop.Controllers
             return RedirectToAction("Create"); //volta pra view Create atualizada
         }
 
+        public async Task<IActionResult> ConfirmOrder()
+        {
+            var response = await _orderRepository.ConfirmOrderAsync(this.User.Identity.Name); //método confirma a ordeme devolve um true caso tuso corra bem
+
+            if (response)
+            {
+                return RedirectToAction("Index"); //voltar para index com lista de orders se response = true
+            }
+
+            return RedirectToAction("Create"); //se response = false, continuar na view create com as orders ainda temporarias 
+        }
     }
 }

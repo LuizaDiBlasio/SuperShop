@@ -16,5 +16,7 @@ namespace SuperShop.Data
         Task ModifyOrderDetailTempQuantityAsync(int id, int quantity);  //modifica a quantidade total de produtos na order quando novos item são adicionados
 
         Task DeleteDetailTempAsync(int id); //deleta a order temporária
+
+        Task<bool> ConfirmOrderAsync(string userName);
     }
 }
