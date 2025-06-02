@@ -1,7 +1,9 @@
 ﻿
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using SuperShop.Data.Entities;
+using System.Linq;
 
 namespace SuperShop.Data
 {
@@ -25,5 +27,22 @@ namespace SuperShop.Data
         {
             
         }
+
+        // Habilita ou desabilita o modo cascata??? fiquei confusa com o Restrict ao final
+        //protected override void OnModelCreating(ModelBuilder modelBuilder) //desabilita deletar em cascata direto na base de dados para impedir múltiplos caminhos de deleção em cascata.
+        //{
+        //    //antes de criar o modelo
+        //    var cascadeFKs = modelBuilder.Model
+        //         .GetEntityTypes() //buscar todas as entidades
+        //         .SelectMany(t => t.GetForeignKeys()) //selecionar todas as chaves estrangeiras 
+        //         .Where(fk => !fk.IsOwnership && fk.DeleteBehavior == DeleteBehavior.Cascade); // que tenham comportamento em cascata (relações com outras tabelas)
+
+        //    foreach (var fk in cascadeFKs)
+        //    {
+        //        fk.DeleteBehavior = DeleteBehavior.Restrict; // restringe comportamento ao deletar, se houver entidades filhas, não deleta. Deve ser deletado por código individualmente.
+        //    }
+
+        //    base.OnModelCreating(modelBuilder); //devolve o modelo modificado
+        //}
     }
 }

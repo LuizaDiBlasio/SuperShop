@@ -55,7 +55,7 @@ namespace SuperShop.Controllers
         }
 
         // GET: Products/Create
-        [Authorize(Roles ="Admin")] //Data Anotation que dá acesso somente users autorizados (logados)
+        
         public IActionResult Create()
         {
             return View(); 
@@ -177,15 +177,42 @@ namespace SuperShop.Controllers
         // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")] //Reencaminhamento, nomeia a ação POST (do Delete) como Delete, para poder ser reconhecida na view quando fizer um submit
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")] //Data Anotation que dá acesso somente user admin
 
         //esta action deleta o produto de fato
         public async Task<IActionResult> DeleteConfirmed(int id) // id orbigatório para poder apagar 
         {
-            var product = await _productRepository.GetByIdAsync(id); // buscar produto pelo repositorio
+            var product = await _productRepository.GetByIdAsync(id); // buscar produto pelo repositorio 
 
-            await _productRepository.DeleteAsync(product); //remove produto em memoria pelo repositorio
+            try
+            {
+                //throw new Exception("Execeção teste")
 
-            return RedirectToAction(nameof(Index)); // volta para a lista de produtos no Index, sem o produto
+                await _productRepository.DeleteAsync(product); //remove produto em memoria pelo repositorio
+
+                return RedirectToAction(nameof(Index)); // volta para a lista de produtos no Index, sem o produto
+            }
+            catch (DbUpdateException ex) 
+            {
+                
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("DELETE")) // Se msg detalhada da exceção não é nula e contem a palavra DELETE     
+                    {
+                        ViewBag.ErrorTitle = $"{product.Name} provavelmente está sendo usado";
+
+                        ViewBag.ErrorMessage = $"{product.Name} não pode ser apagado pois está em outras encomendas. <br></br>" + //<br> usado na formatação html na Vier Error
+                            $"Tente apagar primeiro todas as encomendas com este produto," +
+                            $"e torne novamente a apagá-lo"; 
+                    }
+
+                return View("Error");
+                    
+            }
+
+            
+
+            
+
+            
         }
 
         public IActionResult ProductNotFound()
