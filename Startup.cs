@@ -8,12 +8,6 @@ using Microsoft.Extensions.Hosting;
 using SuperShop.Data;
 using SuperShop.Data.Entities;
 using SuperShop.Helpers;
-using System;
-using Microsoft.Extensions.Azure;
-using Azure.Data.Tables;
-using Azure.Storage.Queues;
-using Azure.Storage.Blobs;
-using Azure.Core.Extensions;
 
 namespace SuperShop
 {
@@ -43,7 +37,7 @@ namespace SuperShop
 
             }).AddEntityFrameworkStores<DataContext>(); //Depois do serviço implementado continua a usar o DataContext, aplicar o serviço criado à BD
 
-            
+
 
             //serviço de conexão que registra o DataContext e indica o uso da connection string escrita no appsettings
             services.AddDbContext<DataContext>(cfg =>
@@ -64,8 +58,10 @@ namespace SuperShop
                                                                          // num próximo uso, o objeto antigo será destruído e um novo será instanciado 
                                                                          //O serviço de Interface de repositórios permite trocar repositórios e fazer testes com diversar bases de dados
                                                                          // basta manter a interface base IRepository e trocar o repositório que se comunica com a nova base de dados (Repository)
-                                                                         
+
             services.AddScoped<IOrderRepository, OrderRepository>();
+
+            services.AddScoped<ICountryRepository, CountryRepository>();
 
             //anula o ReturnUrl no Login (AccountController)
             services.ConfigureApplicationCookie(options =>
@@ -95,11 +91,11 @@ namespace SuperShop
             app.UseStatusCodePagesWithReExecute("/error/{0}"); //não encontra uma certa´página e reexecuta algo, envia por parametro o endpoint do controller que diz como as páginas são executadas
 
             app.UseHttpsRedirection();
-            
+
             app.UseStaticFiles();
 
             app.UseRouting();
-            
+
             app.UseAuthentication(); // usar autenticação, tem que ser na ordem, antes do enpoints e authorizations
 
             app.UseAuthorization();

@@ -12,6 +12,6 @@ namespace SuperShop.Data
     {
         public IQueryable GetAllWithUsers();
 
-        IEnumerable<SelectListItem> GetComboProducts(); //bosca lista de produtos para colocar na combobox no formato SelectListItem de html
+        IEnumerable<SelectListItem> GetComboProducts(); //busca lista de produtos para colocar na combobox no formato SelectListItem de html
     }
 }

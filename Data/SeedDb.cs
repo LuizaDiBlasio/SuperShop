@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Data.Entities;
 using SuperShop.Helpers;
+using SuperShop.Migrations;
 
 namespace SuperShop.Data
 {
@@ -32,6 +34,24 @@ namespace SuperShop.Data
 
             await _userHelper.CheckRoleAsync("Customer"); //verificar se já existe um role de customer, se não existir cria
 
+            if (!_context.Countries.Any()) // Se não existem países
+            {
+                //adicionar cidades do país
+                var cities = new List<City>();
+                cities.Add(new City { Name = "Lisboa" });
+                cities.Add(new City { Name = "Porto" });
+                cities.Add(new City { Name = "Faro" });
+
+                //criar país
+                _context.Countries.Add(new Country
+                {
+                    Cities = cities,
+                    Name = "Portugal"
+                });
+
+                await _context.SaveChangesAsync();  
+            } 
+
             var user = await _userHelper.GetUserByEmailAsync("Luizabandeira90@gmail.com"); //ver se user já existe 
 
             if (user == null) // caso não encontre o utilizador 
@@ -42,7 +62,10 @@ namespace SuperShop.Data
                     LastName = "Bandeira",
                     Email = "luizabandeira90@gmail.com",
                     UserName = "luizabandeira90@gmail.com",
-                    PhoneNumber = "12345678"
+                    PhoneNumber = "12345678",
+                    Address = "Rua Jaul",
+                    CityId = _context.Countries.FirstOrDefault().Cities.FirstOrDefault().Id,
+                    City = _context.Countries.FirstOrDefault().Cities.FirstOrDefault()
                 };
 
                 var result = await _userHelper.AddUserAsync(user, "123456"); //criar utilizador, mandar utilizador e password

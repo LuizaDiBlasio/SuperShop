@@ -117,6 +117,22 @@ namespace SuperShop.Data
             await _context.SaveChangesAsync();  //salvar alterações na bd
         }
 
+        public async Task DeliverOrder(DeliveryViewModel model)
+        {
+            var order = await _context.Orders.FindAsync(model.Id);  //busco a order
+
+            if(order == null)
+            {
+                return; //caso não exista, interrompe metodo 
+            }
+
+            order.DeliveryDate = model.DeliveryDate; //caso exista, colocar a data do modelo na order
+
+            _context.Orders.Update(order); //atualizar na memomória
+
+            await _context.SaveChangesAsync(); //salvar na base de dados  
+        }
+
         public async Task<IQueryable<OrderDetailTemp>> GetDetailTempsAsync(string name)
         {
            var user = await _userHelper.GetUserByEmailAsync(name); //sempre verificar o user
@@ -155,6 +171,11 @@ namespace SuperShop.Data
 
             //caso não seja admin, buscar todas as orders do user (Ir na lista Items em Orders  buscar orders com nome do produto, ordenar por data da order )
             return _context.Orders.Include(o => o.Items).ThenInclude(p => p.Product).Where(o => o.User == user).OrderByDescending(o => o.OrderDate);  
+        }
+
+        public async Task<Order> GetOrderAsync(int id)
+        {
+           return await _context.Orders.FindAsync(id); //retorna order encontrada por id
         }
 
         public async Task ModifyOrderDetailTempQuantityAsync(int id, int quantity) //order já foi selecionada, e agora vai ter sua quantidade modificada

@@ -21,11 +21,14 @@ namespace SuperShop.Data
 
         public DbSet<OrderDetailTemp> OrderDetailsTemp { get; set; }    
 
+        public DbSet<Country> Countries { get; set; } 
+
+        public DbSet<City> Cities { get; set; }
+
         // Recebe as configurações através do objeto options (DbContextOptions) e passa para a classe base DbContext,
         // permitindo que o Entity Framework configure e acesse o banco de dados.
         public DataContext(DbContextOptions<DataContext> options) : base (options) //DbOptions: Contém configurações (tipo de banco, string de conexão etc.)
-        {
-            
+        {      
         }
 
         // Habilita ou desabilita o modo cascata??? fiquei confusa com o Restrict ao final

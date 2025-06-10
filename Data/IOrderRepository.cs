@@ -18,5 +18,9 @@ namespace SuperShop.Data
         Task DeleteDetailTempAsync(int id); //deleta a order temporária
 
         Task<bool> ConfirmOrderAsync(string userName);
+
+        Task DeliverOrder(DeliveryViewModel model); //coloca a dada da entrega
+
+        Task<Order> GetOrderAsync(int id);  //busca order por id
     }
 }

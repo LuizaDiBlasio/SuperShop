@@ -16,10 +16,10 @@ namespace SuperShop.Data.Entities
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm tt}", ApplyFormatInEditMode = false)] //formatação da date em ano mes dia ano hora minuto segundo
         public DateTime OrderDate { get; set; }
 
-        [Required]
+        
         [DisplayName("Delivery date")]
-        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm tt}", ApplyFormatInEditMode = false)] //formatação da date em ano mes dia ano hora minuto segundo
-        public DateTime DeliveryDate { get; set; }
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd }", ApplyFormatInEditMode = false)] //formatação da date em ano mes dia ano hora minuto segundo
+        public DateTime? DeliveryDate { get; set; } //opcional
 
         [Required]
         public User User { get; set; }

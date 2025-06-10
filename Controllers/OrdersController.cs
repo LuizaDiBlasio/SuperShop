@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SuperShop.Data;
@@ -102,6 +103,46 @@ namespace SuperShop.Controllers
             }
 
             return RedirectToAction("Create"); //se response = false, continuar na view create com as orders ainda temporarias 
+        }
+
+        public async Task<IActionResult> Deliver(int? id) //mostra na view o model de DeliverViewModel (mostra a data de entrega)
+        {
+            if (id ==null)
+            {
+                return NotFound();
+            }
+
+            var order = await _orderRepository.GetOrderAsync(id.Value); 
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            //se o id não for nulo e existir a order, criar o mel para mostrar a data de entrega
+            var model = new DeliveryViewModel
+            {
+                Id = order.Id,
+                DeliveryDate = DateTime.Today
+            };
+
+            return View(model); //retornar o model para a view
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Deliver(DeliveryViewModel model) //faz o submit do Deliver, salva a data de entrega na DB
+        {
+            if (ModelState.IsValid)
+            {
+               await _orderRepository.DeliverOrder(model); //salva
+
+                return RedirectToAction("Index");
+            }
+
+
+            return View(); //retornar para a view
+
         }
     }
 }
