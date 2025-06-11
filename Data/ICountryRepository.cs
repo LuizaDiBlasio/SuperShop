@@ -20,6 +20,12 @@ namespace SuperShop.Data
 
         Task<int> UpdateCityAsync(City city); //Faz update da cidade e devolve o id deste objeto após atualização
 
-        Task<int> DeleteCityAsync(City city); 
+        Task<int> DeleteCityAsync(City city);
+
+        IEnumerable<SelectListItem> GetComboCountries(); //preenche combobox dos países
+
+        IEnumerable<SelectListItem> GetComboCities(int countryId); //preenche combobox das cidades em função do país
+
+        Task<Country> GetCountyAsync(City city); //retorna um país em função de uma cidade
     }
 }

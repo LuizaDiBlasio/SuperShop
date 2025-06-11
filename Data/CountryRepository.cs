@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using SuperShop.Data.Entities;
 using SuperShop.Models;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -83,11 +85,56 @@ namespace SuperShop.Data
             return country.Id;  //retornar id do país para poder voltar ao país
         }
 
-        public async Task<Country> GetCountryAsync(City city)
+
+        public IEnumerable<SelectListItem> GetComboCountries()
+        {
+            var list = _context.Countries.Select(c => new SelectListItem //colocar cada coubtry da tabela na lista de itens
+            {
+                //preencher as propriedades da combobox
+                Text = c.Name,
+                Value = c.Id.ToString()
+            }).OrderBy(i => i.Text).ToList(); //ordenar por nome
+
+            //primeiro item fora do range para colocar um placeholder
+            list.Insert(0, new SelectListItem
+            {
+                Text = "Select a country...",
+                Value = "0"
+            });
+
+            return list; //vvai direto pro html na combo
+        }
+
+        public IEnumerable<SelectListItem> GetComboCities(int countryId)
+        {
+            var country = _context.Countries.Find(countryId); //buscar country
+
+            var list = new List<SelectListItem>();  //instanciar lista para receber cidades 
+
+            if (country != null) //se country existe
+            {
+                list = _context.Cities.Select(c => new SelectListItem //colocar cada city da tabela na lista de itens
+                {
+                    //preencher as propriedades da combobox
+                    Text = c.Name,
+                    Value = c.Id.ToString()
+                }).OrderBy(i => i.Text).ToList(); //ordenar por nome
+
+                //primeiro item fora do range para colocar um placeholder
+                list.Insert(0, new SelectListItem
+                {
+                    Text = "Select a city...",
+                    Value = "0"
+                });
+            }
+            return list; //lista vazia caso não exista país ou lista com cidades caso exita país
+        }
+
+        public async Task<Country> GetCountyAsync(City city)
         {
             //buscar país pelas cidades
             return await _context.Countries
-                        .Where(c => c.Cities.Any(c => c.Id == city.Id)) 
+                        .Where(c => c.Cities.Any(c => c.Id == city.Id)) //verificar match de  id
                         .FirstOrDefaultAsync();
         }
     }

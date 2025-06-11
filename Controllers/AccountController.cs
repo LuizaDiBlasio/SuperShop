@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SuperShop.Data;
 using SuperShop.Data.Entities;
 using SuperShop.Helpers;
 using SuperShop.Models;
@@ -12,10 +13,12 @@ namespace SuperShop.Controllers
     {
         IUserHelper _userHelper;
 
-
-        public AccountController(IUserHelper userHelper)
+        ICountryRepository _countryRepository;  
+        public AccountController(IUserHelper userHelper, ICountryRepository countryRepository)
         {
             _userHelper = userHelper;
+
+            _countryRepository = countryRepository; 
 
         }
 
@@ -63,11 +66,17 @@ namespace SuperShop.Controllers
 
         public IActionResult Register() //só mostra a view do Register
         {
-            return View();  
+            var model = new RegisterNewUserViewModel
+            {
+                Countries = _countryRepository.GetComboCountries(), //preencher combo dos paíse
+                Cities = _countryRepository.GetComboCities(0) // preencher combo das cities - mandar Id 0 fora de range para preencher com placeholder em prieiro lugar
+            };
+
+            return View(model); //mandar model com combos preenchidas para a View  
         }
 
-        [HttpPost]
 
+        [HttpPost]
         public async Task<IActionResult> Register(RegisterNewUserViewModel model) // registra o user
         {
             if (ModelState.IsValid) //ver se modelo é válido
@@ -76,12 +85,18 @@ namespace SuperShop.Controllers
 
                 if(user == null) // caso user não exista, registrá-lo
                 {
+                    var city = await _countryRepository.GetCityAsync(model.CityId); //buscar a cidade selecionada na combo
+
                     user = new User
                     {
                         FirstName = model.FirstName,
                         LastName = model.LastName,
                         Email = model.Username,
-                        UserName = model.Username
+                        UserName = model.Username,
+                        Address = model.Address,
+                        PhoneNumber = model.PhoneNumber,
+                        CityId = model.CityId,
+                        City = city 
                     };
 
                     var result = await _userHelper.AddUserAsync(user, model.Password); //add user depois de criado
@@ -124,6 +139,7 @@ namespace SuperShop.Controllers
             return View(model); //passa modelo de volta para não ficar campos em branco
         }
 
+        //GET do ChangeUser
         public async Task<IActionResult> ChangeUser()
         {
             var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name); //buscar user por email
@@ -134,10 +150,31 @@ namespace SuperShop.Controllers
             {
                 model.FirstName = user.FirstName;
                 model.LastName = user.LastName;
+                model.Address = user.Address;
+                model.PhoneNumber = user.PhoneNumber;
+
+                var city = await _countryRepository.GetCityAsync(user.CityId);//buscar a cidade do user
+
+                if (city != null) // caso encontrada 
+                {
+                    var country = await _countryRepository.GetCountyAsync(city); //buscar o país por meio da cidade
+
+                    if (country != null) //caso país seja encontrado
+                    {
+                        model.CountryId = country.Id; //preencher o país do user
+                        model.CityId = user.CityId; // preencher a cidade do user 
+                        model.Cities = _countryRepository.GetComboCities(country.Id); //preencher combo com cidade atual do user
+                        model.Countries = _countryRepository.GetComboCountries(); //preencher combo
+                    }
+                }
             }
+
+            model.Cities = _countryRepository.GetComboCities(model.CountryId);
+            model.Countries = _countryRepository.GetComboCountries();
 
             return View(model); //retornar model novo para view
         }
+
 
         [HttpPost]
         public async Task<IActionResult> ChangeUser(ChangeUserViewModel model)
@@ -148,8 +185,15 @@ namespace SuperShop.Controllers
 
                 if (user != null) //caso user exista, user com propridades registradas no modelo
                 {
+                    var city = await _countryRepository.GetCityAsync(model.CityId); //buscar cidade
+
                     user.FirstName = model.FirstName;
                     user.LastName = model.LastName; 
+                    user.Address = model.Address;
+                    user.PhoneNumber = model.PhoneNumber;
+                    user.CityId = model.CityId;
+                    user.City = city;
+                    
 
                     var response = await _userHelper.UpdateUserAsync(user); //fazer update do user
 
@@ -202,6 +246,15 @@ namespace SuperShop.Controllers
         public IActionResult NotAuthorized()
         {
             return View();      
+        }
+
+        [HttpPost]
+        [Route("Account/GetCitiesAsync")] //mapeamento para o AJAX: quando houver essa URL, executar essa action
+        public async Task<JsonResult> GetCitiesAsync(int countryId) //retorna em jason result para poder popular a lista com objetos
+        {
+            var country = await _countryRepository.GetCountryWithCitiesAsync(countryId); //buscar país com lista das suas cidades
+
+            return this.Json(country.Cities.OrderBy(c => c.Name)); //retornar todas as cidades ordenadas por nome e convertidas para Json
         }
     }
 }
