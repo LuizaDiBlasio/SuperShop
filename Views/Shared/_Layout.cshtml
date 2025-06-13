@@ -30,7 +30,7 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Index">Products</a>
                         </li>
 
-                        @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Admin")) //se ueser está autenticado é é o admin
+                        @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Admin")) //se user está autenticado é é o admin
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Admin</a>

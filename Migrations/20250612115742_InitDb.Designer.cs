@@ -10,8 +10,8 @@ using SuperShop.Data;
 namespace SuperShop.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250605104012_ChangeUser")]
-    partial class ChangeUser
+    [Migration("20250612115742_InitDb")]
+    partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

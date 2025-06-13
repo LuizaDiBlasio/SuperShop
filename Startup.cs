@@ -5,9 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using SuperShop.Data;
 using SuperShop.Data.Entities;
 using SuperShop.Helpers;
+using System.Text;
 
 namespace SuperShop
 {
@@ -37,7 +39,17 @@ namespace SuperShop
 
             }).AddEntityFrameworkStores<DataContext>(); //Depois do serviço implementado continua a usar o DataContext, aplicar o serviço criado à BD
 
-
+            //adicionar servico de autentificação para o Token e configurar os parâmetros
+            services.AddAuthentication().AddCookie().AddJwtBearer(cfg =>
+            {
+                //mandar configurações do token
+                cfg.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidIssuer = this.Configuration["Tokens:Issuer"],
+                    ValidAudience = this.Configuration["Tokens:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"]))
+                };
+            });
 
             //serviço de conexão que registra o DataContext e indica o uso da connection string escrita no appsettings
             services.AddDbContext<DataContext>(cfg =>
@@ -47,7 +59,6 @@ namespace SuperShop
 
             services.AddTransient<SeedDb>(); // configuração da injeção de dependências, objeto criado quando serviço for requisitado,
                                              // depois de usado é descartado e só poderá ser criado novamente em uma nova execução da aplicação 
-
             services.AddScoped<IUserHelper, UserHelper>();
 
             services.AddScoped<IBlobHelper, BlobHelper>();

@@ -6,11 +6,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SuperShop.Data.Entities;
 using SuperShop.Helpers;
-using SuperShop.Migrations;
 
 namespace SuperShop.Data
 {
-    public class SeedDb //classe responsável pelo Seed --> funcionalidade para alimentar ábase de dados sempre que elafor iniciada vazia 
+    public class SeedDb //classe responsável pelo Seed --> funcionalidade para alimentar ábase de dados sempre que ela for iniciada vazia 
     {
         private readonly DataContext _context;
 

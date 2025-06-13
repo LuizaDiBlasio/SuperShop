@@ -1,25 +1,36 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using SuperShop.Data;
 using SuperShop.Data.Entities;
 using SuperShop.Helpers;
 using SuperShop.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SuperShop.Controllers
 {
     public class AccountController : Controller //controller responsável por logins
     {
-        IUserHelper _userHelper;
+        private readonly IUserHelper _userHelper;
 
-        ICountryRepository _countryRepository;  
-        public AccountController(IUserHelper userHelper, ICountryRepository countryRepository)
+        private readonly ICountryRepository _countryRepository;  
+
+        private readonly IConfiguration _configuration; //para aceder o appsettings.json
+
+
+        public AccountController(IUserHelper userHelper, ICountryRepository countryRepository, IConfiguration configuration)
         {
             _userHelper = userHelper;
 
             _countryRepository = countryRepository; 
 
+            _configuration = configuration;
         }
 
         //action do login para inserir credenciais
@@ -241,6 +252,52 @@ namespace SuperShop.Controllers
             }
 
             return this.View(model); //retornar model para view caso corra mal
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> CreateToken([FromBody] LoginViewModel model)// recebe um modelo LoginViewMode que te user e password
+        {
+            if (this.ModelState.IsValid) //se o modelo for válido 
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.Username); //verificar se o email existe
+                if (user != null)
+                {
+                    //validar password
+                    var result = await _userHelper.ValidatePasswordAsync( 
+                        user,
+                        model.Password);
+
+                    if (result.Succeeded) //se válido
+                    {
+                        //criar claims (objetos usados para fazer tolkens, autorizações, autenticações, percurso do usuario na aplicação)
+                        var claims = new[]
+                        {
+                        new Claim(JwtRegisteredClaimNames.Sub, user.Email), //registra email
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) //criar Guid associado ao email
+                };
+
+                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"])); //Encriptação da key no arquivo appsettings
+                        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); //algoritmo que gera um token com a key
+                        var token = new JwtSecurityToken( //configuração do token
+                            _configuration["Tokens:Issuer"],
+                            _configuration["Tokens:Audience"],
+                            claims,
+                            expires: DateTime.UtcNow.AddDays(15), //tempo de validade
+                            signingCredentials: credentials);
+
+                        var results = new //gera objeto anônimo de retorno que contém token e validade
+                        {
+                            token = new JwtSecurityTokenHandler().WriteToken(token),
+                            expiration = token.ValidTo
+                        };
+
+                        return this.Created(string.Empty, results); //retornar resultado
+                    }
+                }
+            }
+
+            return BadRequest(); // em caso de insucesso, madar bad request
         }
 
         public IActionResult NotAuthorized()
