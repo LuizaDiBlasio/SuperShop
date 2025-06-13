@@ -25,6 +25,13 @@ namespace SuperShop.Helpers
 
         Task<bool> IsUserInRoleAsync(User user, string roleName); // verifica se user está designado ao role
 
-        Task<SignInResult> ValidatePasswordAsync(User user, string password); //não faz login, só valida a password 
+        Task<SignInResult> ValidatePasswordAsync(User user, string password); //não faz login, só valida a password para acesso à API
+
+        Task<string> GenerateEmailConfirmationTokenAsync(User user); //Gera o email de confirmação e insere o Token 
+
+        Task<IdentityResult> ConfirmEmailAsync(User user, string token); //Valida o email, verifica se o token é valido
+
+        Task<User> GetUserByIdAsync(string id); //recebe um id e devolve o user correspondente
+
     }
 }

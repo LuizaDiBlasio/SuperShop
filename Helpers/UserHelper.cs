@@ -50,9 +50,24 @@ namespace SuperShop.Helpers
             }
         }
 
+        public async Task<IdentityResult> ConfirmEmailAsync(User user, string token)
+        {
+            return await _userManager.ConfirmEmailAsync(user, token); //bypass de um metodo da classe UserManager
+        }
+
+        public async Task<string> GenerateEmailConfirmationTokenAsync(User user)
+        {
+            return await _userManager.GenerateEmailConfirmationTokenAsync(user); //bypass de um metodo da classe UserManager
+        }
+
         public async Task<User> GetUserByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);
+        }
+
+        public Task<User> GetUserByIdAsync(string id)
+        {
+            return _userManager.FindByIdAsync(id);
         }
 
         public async Task<bool> IsUserInRoleAsync(User user, string roleName)

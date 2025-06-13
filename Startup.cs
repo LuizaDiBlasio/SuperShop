@@ -29,6 +29,8 @@ namespace SuperShop
             services.AddIdentity<User, IdentityRole>(cfg => //adicionar serviço de Identiy para ter o user e configurar o serviço
             {
                 //configurações inseguras para poder fazer testes, mas em cenário déprodução deve ser o oposto
+                cfg.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider; //buscar token com provider default
+                cfg.SignIn.RequireConfirmedEmail = true; //só permitir sign in se confirmar email
                 cfg.User.RequireUniqueEmail = true;
                 cfg.Password.RequireDigit = false;
                 cfg.Password.RequiredUniqueChars = 0;
@@ -37,9 +39,11 @@ namespace SuperShop
                 cfg.Password.RequireNonAlphanumeric = false;
                 cfg.Password.RequiredLength = 6;
 
-            }).AddEntityFrameworkStores<DataContext>(); //Depois do serviço implementado continua a usar o DataContext, aplicar o serviço criado à BD
+            }).AddEntityFrameworkStores<DataContext>() //Depois do serviço implementado continua a usar o DataContext, aplicar o serviço criado à BD
+              .AddDefaultTokenProviders();
 
-            //adicionar servico de autentificação para o Token e configurar os parâmetros
+            //adicionar servico de autentificação do Token e configurar os parâmetros
+            //vai ser utilizado na autenticação do user quando for usar a API dos produtos
             services.AddAuthentication().AddCookie().AddJwtBearer(cfg =>
             {
                 //mandar configurações do token
@@ -64,6 +68,8 @@ namespace SuperShop
             services.AddScoped<IBlobHelper, BlobHelper>();
 
             services.AddScoped<IConverterHelper, ConverterHelper>();
+
+            services.AddScoped<IMailHelper, MailHelper>();
 
             services.AddScoped<IProductRepository, ProductRepository>(); //quando for necessário, instanciar o objeto de Repository
                                                                          // num próximo uso, o objeto antigo será destruído e um novo será instanciado 

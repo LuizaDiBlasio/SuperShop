@@ -75,6 +75,10 @@ namespace SuperShop.Data
                 }
 
                 await _userHelper.AddUserToRoleAsync(user, "Admin"); //adiciona role ao user
+
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user); //gerar email e token
+
+                await _userHelper.ConfirmEmailAsync(user, token); //confirmar email
             }
 
             var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin"); //verifica se role foi designado para user existente

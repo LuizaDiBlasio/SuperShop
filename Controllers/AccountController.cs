@@ -12,6 +12,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Primitives;
 
 namespace SuperShop.Controllers
 {
@@ -23,14 +24,18 @@ namespace SuperShop.Controllers
 
         private readonly IConfiguration _configuration; //para aceder o appsettings.json
 
+        private readonly IMailHelper _mailHelper; 
 
-        public AccountController(IUserHelper userHelper, ICountryRepository countryRepository, IConfiguration configuration)
+
+        public AccountController(IUserHelper userHelper, ICountryRepository countryRepository, IConfiguration configuration, IMailHelper mailHelper)
         {
             _userHelper = userHelper;
 
             _countryRepository = countryRepository; 
 
             _configuration = configuration;
+
+            _mailHelper = mailHelper;   
         }
 
         //action do login para inserir credenciais
@@ -121,21 +126,26 @@ namespace SuperShop.Controllers
                     //TODO  checar se roles estão corretos pra customer
                     await _userHelper.AddUserToRoleAsync(user, "Customer"); //adiciona role ao user
 
-                    var loginViewModel = new LoginViewModel //mandar informações de login
-                    {
-                        Password = model.Password,
-                        RememberMe = false,
-                        Username = model.Username
-                    };
+                    string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user); //gerar o token
 
-                    var result2 = await _userHelper.LoginAsync(loginViewModel); //fazer login 
-
-                    if(result2.Succeeded) //se conseguiu logar, redirecionar para Home
+                    // gera um link de confirmção para o email
+                    string tokenLink = Url.Action("ConfirmEmail", "Account", new  //Link gerado na Action ConfirmEmail dentro do AccountController, ela recebe 2 parametros (userId e token)
                     {
-                        return RedirectToAction("Index", "Home");
+                        userId = user.Id,
+                        token = myToken
+                    }, protocol: HttpContext.Request.Scheme); //utiliza o protocolo Http para passar dados de uma action para a outra
+
+                    Response response = _mailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email Confirmation</h1>" +
+                    $"To allow the user,<br><br><a href = \"{tokenLink}\">Confirm Email</a>"); //Contruir email e enviá-lo com o link 
+
+                    if(response.IsSuccess) //se conseguiu enviar o email
+                    {
+                        ViewBag.Message = "Confirmation instructions have been sent to your email";
+
+                        return View(model);
                     }
 
-                    //se não conseguiu loggar:
+                    //se não conseguiu enviar email:
                     ModelState.AddModelError(string.Empty, "The user couldn't be logged");
                 }
 
@@ -299,6 +309,32 @@ namespace SuperShop.Controllers
 
             return BadRequest(); // em caso de insucesso, madar bad request
         }
+
+
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if(string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token)) //verificar parâmetros
+            {
+                return NotFound();
+            }
+
+            var user = await _userHelper.GetUserByIdAsync(userId); //verificar user
+
+            if(user == null)
+            {
+                return NotFound();  
+            }
+
+            var result = await _userHelper.ConfirmEmailAsync(user, token); //resposta do email, ver se user e token dão match
+
+            if (!result.Succeeded)
+            {
+                return NotFound();
+            }
+
+            return View();
+        }
+
 
         public IActionResult NotAuthorized()
         {
