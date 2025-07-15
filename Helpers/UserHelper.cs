@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SuperShop.Data.Entities;
 using SuperShop.Models;
 
@@ -60,6 +62,11 @@ namespace SuperShop.Helpers
             return await _userManager.GenerateEmailConfirmationTokenAsync(user); //bypass de um metodo da classe UserManager
         }
 
+        public async Task<string> GeneratePasswordResetTokenAsync(User user)
+        {
+            return await _userManager.GeneratePasswordResetTokenAsync(user);    
+        }
+
         public async Task<User> GetUserByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);
@@ -85,6 +92,11 @@ namespace SuperShop.Helpers
             await _signInManager.SignOutAsync();
         }
 
+        public async Task<IdentityResult> ResetPasswordAsync(User user, string token, string password)
+        {
+            return await _userManager.ResetPasswordAsync(user, token, password);
+        }
+
         public async Task<IdentityResult> UpdateUserAsync(User user)
         {
             return await _userManager.UpdateAsync(user);
@@ -94,5 +106,7 @@ namespace SuperShop.Helpers
         {
             return await _signInManager.CheckPasswordSignInAsync(user, password, false); //o false é para não bloquear após muitas tentativas, em ambiente de produção, tem que ser true
         }
+
+        
     }
 }

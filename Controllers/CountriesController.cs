@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using SuperShop.Data;
 using SuperShop.Data.Entities;
 using SuperShop.Models;
+using System;
 using System.Threading.Tasks;
+using Vereyon.Web;
 
 namespace SuperShop.Controllers
 {
@@ -11,10 +13,15 @@ namespace SuperShop.Controllers
     public class CountriesController : Controller
     {
         private readonly ICountryRepository _countryRepository;
-        public CountriesController(ICountryRepository countryRepository)
+
+        private readonly IFlashMessage _flashMessage;
+
+        public CountriesController(ICountryRepository countryRepository, IFlashMessage flashMessage)
         {
             _countryRepository = countryRepository;
+            _flashMessage = flashMessage;   
         }
+
         public IActionResult Index()
         {
             return View(_countryRepository.GetCountriesWithCities()); //lista de todos os países com todas as cidades 
@@ -137,9 +144,18 @@ namespace SuperShop.Controllers
         {
             if(ModelState.IsValid)
             {
-                await _countryRepository.CreateAsync(country); //criar
+                try
+                {
+                    await _countryRepository.CreateAsync(country); //criar
 
-                return RedirectToAction(nameof(Index));  //voltar para a Index
+                    return RedirectToAction(nameof(Index));  //voltar para a Index
+                }
+                catch (Exception)
+                {
+                    _flashMessage.Danger("This country already exists");
+                }
+
+                return View(country); //permanecer na View
             }
 
             return View(country);   //retornar View com country caso não dê certo a criação

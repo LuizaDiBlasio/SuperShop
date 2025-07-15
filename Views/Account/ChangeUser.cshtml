@@ -56,9 +56,9 @@
     }
 
     <script type="text/javascript">
-        $(document).ready(function () { /* ready: espera o html todo estar carregado para poder realizar o JS */
-            $("#CountryId").change(function () { /* change: quando houver uma mudança na caixa CountryId, esvazia a combo de cidades */
-                $("#CityId").empty();
+        $(document).ready(function () { /* ready: espera o html todo estar carregado para poder realizar o JS, $ é o símbolo getter do jquery*/  
+            $("#CountryId").change(function () { /* change: quando houver uma mudança na caixa CountryId, esvazia a combo de cidades , # é um id para html*/
+                $("#CityId").empty(); /*limpa combobox*/
                 $.ajax({ /* executa o ajax que executa uma chamada ao servidor mas só nessa zona, não na view toda */
                     url: '@Url.Action("GetCitiesAsync", "Account")', /* corre a URL, com o nome da action (GetCitiesAsync) e o controlador (Account) */
                     type: 'POST', /* especifica o tipo de chamada http */

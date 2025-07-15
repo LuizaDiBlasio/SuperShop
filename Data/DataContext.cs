@@ -31,6 +31,27 @@ namespace SuperShop.Data
         {      
         }
 
+        protected override void OnModelCreating (ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Country>() //quando estiver construindo a entidade Country
+                .HasIndex(c => c.Name)//o nome do país deve ser único
+                .IsUnique();
+
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Price)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<OrderDetailTemp>()
+                .Property(p => p.Price)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<OrderDetail>()
+                .Property(p => p.Price)
+                .HasColumnType("decimal(18,2)");
+
+            base.OnModelCreating (modelBuilder);
+        }
+
         // Habilita ou desabilita o modo cascata??? fiquei confusa com o Restrict ao final
         //protected override void OnModelCreating(ModelBuilder modelBuilder) //desabilita deletar em cascata direto na base de dados para impedir múltiplos caminhos de deleção em cascata.
         //{

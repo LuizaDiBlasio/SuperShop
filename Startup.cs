@@ -9,7 +9,9 @@ using Microsoft.IdentityModel.Tokens;
 using SuperShop.Data;
 using SuperShop.Data.Entities;
 using SuperShop.Helpers;
+using System;
 using System.Text;
+using Vereyon.Web;
 
 namespace SuperShop
 {
@@ -53,7 +55,10 @@ namespace SuperShop
                     ValidAudience = this.Configuration["Tokens:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"]))
                 };
+               
             });
+
+            services.AddFlashMessage();
 
             //serviço de conexão que registra o DataContext e indica o uso da connection string escrita no appsettings
             services.AddDbContext<DataContext>(cfg =>
@@ -79,6 +84,7 @@ namespace SuperShop
             services.AddScoped<IOrderRepository, OrderRepository>();
 
             services.AddScoped<ICountryRepository, CountryRepository>();
+
 
             //anula o ReturnUrl no Login (AccountController)
             services.ConfigureApplicationCookie(options =>

@@ -336,6 +336,80 @@ namespace SuperShop.Controllers
         }
 
 
+        public IActionResult RecoverPassword() //direciona para view de recover da password
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> RecoverPassword(RecoverPasswordViewModel model) //recebe modelo com dados recuperar password
+        {
+            if (this.ModelState.IsValid)//verificar se modelo é válido
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.Email); //buscar user
+                if (user == null)
+                {
+                    //mensagem de erro caso user não exista
+                    ModelState.AddModelError(string.Empty, "The email doesn't correspond to a registered user."); 
+                    return View(model);
+                }
+
+                // caso exista user prosseguir e gerar o token
+                var myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+
+                var link = this.Url.Action( //criar o link de reset da password
+                    "ResetPassword",
+                    "Account",
+                    new { token = myToken },
+                    protocol: HttpContext.Request.Scheme);
+
+                Response response = _mailHelper.SendEmail(model.Email, "Shop Password Reset", $"<h1>Shop Password Reset</h1>" + //mandar o email
+                    $"To reset the password click in this link </br><br/>" +
+                    $"<a href = \"{link}\">Reset Password</a>");
+
+                if (response.IsSuccess) //se correr tudo bem
+                {
+                    this.ViewBag.Message = "The instructions to recover your password has been sent to email.";
+                }
+
+                return this.View();
+            }
+
+            return this.View(model);
+        }
+
+
+        public IActionResult ResetPassword(string token) //direciona para view de reset da password
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model) //recebo modelo preechido com dados para reset da password
+        {
+            var user = await _userHelper.GetUserByEmailAsync(model.Username); //buscar user
+
+            if (user != null) //caso user exista
+            {
+                var result = await _userHelper.ResetPasswordAsync(user, model.Token, model.Password); //fazer reset da password
+                
+                if (result.Succeeded) //se tudo correr bem
+                {
+                    this.ViewBag.Message = "Password reset successful.";
+                    return this.View();
+                }
+
+                //se não correr bem
+                this.ViewBag.Message = "Error while resetting the password.";
+                return View(model);
+            }
+
+            //caso não encontro o user
+            this.ViewBag.Message = "User not found.";
+            return View(model);
+        }
+
         public IActionResult NotAuthorized()
         {
             return View();      
@@ -349,5 +423,6 @@ namespace SuperShop.Controllers
 
             return this.Json(country.Cities.OrderBy(c => c.Name)); //retornar todas as cidades ordenadas por nome e convertidas para Json
         }
+
     }
 }

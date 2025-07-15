@@ -33,5 +33,9 @@ namespace SuperShop.Helpers
 
         Task<User> GetUserByIdAsync(string id); //recebe um id e devolve o user correspondente
 
+        Task<string> GeneratePasswordResetTokenAsync(User user); //cria token do reset da password, user irá receber token
+
+        Task<IdentityResult> ResetPasswordAsync(User user, string token, string password); //Faz o reset da password
+
     }
 }
